@@ -1,0 +1,16 @@
+# mise global tool versions
+# Docs: https://mise.jdx.dev/configuration.html
+#
+# After editing, run: mise install
+# To add a tool: mise use -g <tool>@<version>
+
+[settings]
+ruby.compile = false
+
+[tools]
+go                    = "latest"
+node                  = "lts"
+python                = "latest"
+java                  = "temurin-25"
+ruby                  = "latest"
+"npm:tree-sitter-cli" = "latest"

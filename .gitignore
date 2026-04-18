@@ -1,0 +1,45 @@
+# Whitelist approach  -  everything is ignored by default.
+# Only files explicitly listed below with ! are tracked.
+# To add a new file: add a !path entry in the appropriate section.
+
+# ── Step 1: ignore everything ────────────────────────────────────────────────
+*
+
+# ── Step 2: un-ignore directories that contain tracked files ─────────────────
+!lib/
+!scripts/
+!config/
+
+# ── Step 3: un-ignore specific tracked files ─────────────────────────────────
+
+# Root
+!.gitignore
+!README.md
+!IDEAS.md
+!bootstrap.sh
+
+# lib/
+!lib/common.sh
+
+# scripts/
+!scripts/env.sh
+!scripts/github.sh
+!scripts/ssh.sh
+!scripts/system.sh
+!scripts/shell.sh
+!scripts/git.sh
+!scripts/mise.sh
+!scripts/editors.sh
+!scripts/docker.sh
+!scripts/kubernetes.sh
+!scripts/terraform.sh
+!scripts/ansible.sh
+!scripts/terminal.sh
+!scripts/onepassword.sh
+!scripts/godot.sh
+
+# config/
+!config/mise.toml
+!config/ghostty/
+!config/ghostty/config
+!config/p10k.zsh
