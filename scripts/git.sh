@@ -33,8 +33,36 @@ install_git() {
     fi
 
     configure_git_identity
+    install_delta
+    configure_delta
 
     log "git setup complete."
+}
+
+install_delta() {
+    step "Installing delta"
+    if command_exists delta; then
+        apt_upgrade git-delta
+        log "delta $(delta --version) already installed."
+    else
+        apt_install git-delta
+        log "delta installed."
+    fi
+}
+
+configure_delta() {
+    step "Configuring delta as git pager"
+
+    if ! command_exists delta; then
+        warn "delta not found — skipping git pager config."
+        return
+    fi
+
+    git config --global core.pager                 'delta'
+    git config --global interactive.diffFilter      'delta --color-only'
+    git config --global delta.navigate              true
+    git config --global merge.conflictstyle         diff3
+    log "git pager set to delta."
 }
 
 # Expected 1Password item structure:

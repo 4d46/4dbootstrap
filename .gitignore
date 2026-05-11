@@ -37,6 +37,7 @@
 !scripts/terminal.sh
 !scripts/onepassword.sh
 !scripts/godot.sh
+!scripts/diff-configs.sh
 
 # config/
 !config/mise.toml
