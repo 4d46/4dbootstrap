@@ -7,6 +7,7 @@ install_terminal() {
     require_ubuntu
     install_ghostty
     configure_ghostty
+    set_default_terminal
     log "Terminal setup complete."
 }
 
@@ -70,6 +71,32 @@ configure_ghostty() {
         log "Ghostty config installed to $config_file"
     else
         warn "No config/ghostty/config found in repo — skipping config install."
+    fi
+}
+
+set_default_terminal() {
+    step "Setting Ghostty as default terminal"
+
+    if ! command_exists ghostty; then
+        warn "Ghostty not found — skipping default terminal config."
+        return
+    fi
+
+    local ghostty_bin
+    ghostty_bin="$(command -v ghostty)"
+
+    if ! update-alternatives --list x-terminal-emulator 2>/dev/null | grep -qF "$ghostty_bin"; then
+        sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$ghostty_bin" 50
+    fi
+    sudo update-alternatives --set x-terminal-emulator "$ghostty_bin"
+    log "x-terminal-emulator → $ghostty_bin"
+
+    if command_exists gsettings; then
+        gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty'
+        gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-e'
+        log "GNOME default terminal set to Ghostty."
+    else
+        warn "gsettings not available — GNOME Ctrl+Alt+T shortcut not updated."
     fi
 }
 
