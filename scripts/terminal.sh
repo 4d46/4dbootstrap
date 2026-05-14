@@ -63,6 +63,10 @@ configure_ghostty() {
 
     if [[ -f "$config_file" ]]; then
         log "Ghostty config already exists — leaving it in place."
+        if [[ -f "$repo_config" ]] && ! diff -q "$repo_config" "$config_file" &>/dev/null; then
+            warn "Local Ghostty config differs from repo template. Diff (repo vs local):"
+            diff "$repo_config" "$config_file" || true
+        fi
         return
     fi
 

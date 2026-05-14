@@ -37,9 +37,12 @@
 !scripts/terminal.sh
 !scripts/onepassword.sh
 !scripts/godot.sh
+!scripts/diff-configs.sh
 
 # config/
 !config/mise.toml
 !config/ghostty/
 !config/ghostty/config
+!config/nvim/
+!config/nvim/init.lua
 !config/p10k.zsh
