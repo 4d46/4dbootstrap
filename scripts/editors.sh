@@ -22,6 +22,12 @@ install_clipboard_tools() {
     apt_install wl-clipboard
 }
 
+ensure_nvim_symlinks() {
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$NVIM_INSTALL_DIR/bin/nvim" "$NVIM_BIN"
+    ln -sf "$NVIM_INSTALL_DIR/bin/nvim" "$HOME/.local/bin/vim"
+}
+
 install_neovim() {
     step "Installing Neovim"
 
@@ -41,6 +47,7 @@ install_neovim() {
 
     if [[ "$installed_version" == "$latest_tag" ]]; then
         log "Neovim $installed_version already up to date."
+        ensure_nvim_symlinks
         return
     fi
 
@@ -72,10 +79,8 @@ install_neovim() {
     extracted=$(find "$tmp_dir" -maxdepth 1 -type d -name "nvim-*" | head -1)
     mv "$extracted" "$NVIM_INSTALL_DIR"
 
-    mkdir -p "$HOME/.local/bin"
-    ln -sf "$NVIM_INSTALL_DIR/bin/nvim" "$NVIM_BIN"
-    ln -sf "$NVIM_INSTALL_DIR/bin/nvim" "$HOME/.local/bin/vim"
     trap - RETURN
+    ensure_nvim_symlinks
     log "Neovim $latest_tag installed."
 }
 
