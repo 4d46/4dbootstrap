@@ -43,4 +43,6 @@
 !config/mise.toml
 !config/ghostty/
 !config/ghostty/config
+!config/nvim/
+!config/nvim/init.lua
 !config/p10k.zsh

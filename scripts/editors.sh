@@ -8,13 +8,28 @@ NVIM_BIN="$HOME/.local/bin/nvim"
 
 install_editors() {
     install_neovim
+    install_clipboard_tools
     install_neovim_config
+    configure_neovim_init
     install_vscode
     log "Editors ready."
 }
 
+install_clipboard_tools() {
+    step "Installing clipboard tools for Neovim"
+    # wl-clipboard provides Wayland clipboard support (wl-copy/wl-paste) used by nvim.
+    # Add xclip here too if X11 session support is needed.
+    apt_install wl-clipboard
+}
+
 install_neovim() {
     step "Installing Neovim"
+
+    # Remove any apt-managed neovim that would shadow our install via `vim`
+    if dpkg -l neovim 2>/dev/null | grep -q '^ii'; then
+        log "Removing apt-managed neovim (superseded by ~/.local install)..."
+        sudo apt-get remove -y neovim
+    fi
 
     local latest_tag
     latest_tag=$(get_latest_github_release "neovim/neovim")
@@ -59,6 +74,7 @@ install_neovim() {
 
     mkdir -p "$HOME/.local/bin"
     ln -sf "$NVIM_INSTALL_DIR/bin/nvim" "$NVIM_BIN"
+    ln -sf "$NVIM_INSTALL_DIR/bin/nvim" "$HOME/.local/bin/vim"
     trap - RETURN
     log "Neovim $latest_tag installed."
 }
@@ -93,6 +109,43 @@ install_neovim_config() {
         warn "You are using the upstream kickstart.nvim repo."
         warn "Fork it on GitHub and rerun with NVIM_CONFIG_REPO=https://github.com/YOURUSERNAME/kickstart.nvim.git"
         warn "so your config changes are versioned under your own account."
+    fi
+}
+
+configure_neovim_init() {
+    step "Configuring Neovim init.lua"
+    local config_dir="$HOME/.config/nvim"
+    local target="$config_dir/init.lua"
+    local backup="$config_dir/init.lua.bak"
+    local repo_config="$SCRIPT_DIR/../config/nvim/init.lua"
+
+    if [[ ! -f "$repo_config" ]]; then
+        warn "No config/nvim/init.lua found in repo — skipping."
+        return
+    fi
+
+    if [[ ! -d "$config_dir" ]]; then
+        warn "~/.config/nvim does not exist — skipping init.lua config."
+        return
+    fi
+
+    if [[ ! -f "$backup" ]]; then
+        # First install: back up any existing init.lua, then copy managed version.
+        if [[ -f "$target" ]]; then
+            cp "$target" "$backup"
+            log "Backed up existing init.lua → init.lua.bak"
+        fi
+        cp "$repo_config" "$target"
+        log "init.lua installed from repo."
+        return
+    fi
+
+    # Already installed: diff and warn if drifted.
+    if diff -q "$repo_config" "$target" &>/dev/null; then
+        log "init.lua already matches repo."
+    else
+        warn "init.lua differs from repo config. Diff (repo vs local):"
+        diff "$repo_config" "$target" || true
     fi
 }
 
